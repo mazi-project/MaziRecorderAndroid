@@ -17,8 +17,8 @@ public class InterviewModel {
 
     public String _id;
     public Date creationDate;
-    public String name = "";
-    public String role;
+    public String name = "test";
+    public String role = "test";
     public String text;
     public ArrayList<AttachmentModel> attachments;
     public Uri imageUrl;

@@ -1,13 +1,13 @@
 package de.udk.drl.mazirecorderandroid.models;
 
 import android.content.SharedPreferences;
-import android.widget.ArrayAdapter;
 
 import com.google.gson.Gson;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import io.reactivex.Observable;
 
 /**
  * Created by lutz on 11/04/17.
@@ -17,15 +17,16 @@ public class QuestionStorage {
 
     private static QuestionStorage instance = null;
 
+    private SharedPreferences storage;
     public static final String QUESTION_STORAGE_ITEM = "questions";
 
     public ArrayList<QuestionModel> questions;
-    private SharedPreferences storage;
 
     protected QuestionStorage(SharedPreferences storage) {
-        questions = new ArrayList<QuestionModel>();
+        questions = new ArrayList<>();
         this.storage = storage;
         loadFromStorage();
+
     }
 
     public static QuestionStorage getInstance() {
@@ -69,8 +70,8 @@ public class QuestionStorage {
             Gson gson = new Gson();
             String json = storage.getString(QUESTION_STORAGE_ITEM, "");
             QuestionModel[] models = gson.fromJson(json, QuestionModel[].class);
-            questions = new ArrayList<QuestionModel>(Arrays.asList(models));
+            questions = new ArrayList<>(Arrays.asList(models));
         }
     }
-
 }
+
