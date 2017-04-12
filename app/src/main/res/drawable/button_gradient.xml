@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- border -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/colorButtonBorder" />
+        </shape>
+    </item>
+    <!-- background -->
+    <!-- fill -->
+    <item
+        android:top="2dp"
+        android:bottom="0dp"
+        android:left="0dp"
+        android:right="0dp">
+        <shape xmlns:android="http://schemas.android.com/apk/res/android"
+            android:shape="rectangle">
+            <gradient
+                android:startColor="@color/colorButtonGradientStart"
+                android:endColor="@color/colorButtonGradientEnd"
+                android:angle="270" />
+        </shape>
+    </item>
+</layer-list>

@@ -3,4 +3,17 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorDone">#5b913a</color>
+    <color name="colorCancel">#972b1d</color>
+
+    <color name="colorText">#000000</color>
+    <color name="colorTextLighter">#4d4d4d</color>
+    <color name="colorTextLight">#FFFFFF</color>
+
+    <color name="colorButtonGradientStart">#ffffff</color>
+    <color name="colorButtonGradientEnd">#d7d7d7</color>
+    <color name="colorButtonBorder">#df6717</color>
+    <color name="colorButtonDark">#d7d7d7</color>
+    <color name="colorButtonDarker">#919191</color>
 </resources>
