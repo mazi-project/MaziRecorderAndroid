@@ -20,6 +20,18 @@ public class InterviewModel {
     public String name = "test";
     public String role = "test";
     public String text;
-    public ArrayList<AttachmentModel> attachments;
+    public ArrayList<AttachmentModel> attachments = new ArrayList<>();
     public Uri imageUrl;
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object != null && object instanceof InterviewModel)
+        {
+            InterviewModel model = (InterviewModel) object;
+            return this._id.equals(model._id);
+        }
+        return false;
+    }
+
 }

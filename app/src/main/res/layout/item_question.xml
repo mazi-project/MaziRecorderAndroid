@@ -2,25 +2,26 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content">
 
+    <Button
+        android:id="@+id/question_delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:text="Delete"
+        android:onClick="onItemDeleteButtonClicked"
+        android:layout_marginRight="@dimen/spacing"/>
+
     <TextView
         android:id="@+id/question_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/spacing"
         android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/question_delete_button"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:onClick="onListItemClicked"
         android:text="No Title"/>
-
-    <Button
-        android:id="@+id/question_delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:text="Delete"
-        android:onClick="onItemDeleteButtonClicked"
-        android:layout_marginRight="@dimen/spacing"/>
 
 </RelativeLayout>

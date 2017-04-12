@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">MaziRecorderAndroid</string>
     <string name="title_activity_question_list">QuestionListActivity</string>
+    <string name="title_activity_recorder">Recorder</string>
 </resources>
