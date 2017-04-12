@@ -135,7 +135,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="New Recording"
+                android:text="New&#10;Recording"
                 android:background="@color/colorButtonDark"
                 android:onClick="onCancelButtonClicked"
                 style="@style/textButtonStyle"/>
@@ -146,7 +146,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Save Recording"
+                android:text="Save&#10;Recording"
                 android:onClick="onSaveButtonClicked"
                 android:background="@color/colorDone"
                 style="@style/textButtonStyle"/>

@@ -9,14 +9,14 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:text="Delete"
-        android:onClick="onItemDeleteButtonClicked"
-        android:layout_marginRight="@dimen/spacing"/>
+        android:onClick="onItemDeleteButtonClicked"/>
 
     <TextView
         android:id="@+id/question_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="@dimen/spacing"
+        android:paddingTop="@dimen/spacing"
+        android:paddingBottom="@dimen/spacing"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/question_delete_button"
         android:layout_alignParentBottom="true"

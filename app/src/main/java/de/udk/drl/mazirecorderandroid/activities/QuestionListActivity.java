@@ -50,7 +50,7 @@ public class QuestionListActivity extends AppCompatActivity {
         questionListView.setAdapter(adapter);
     }
 
-    public void onFabButtonClicked(final View view) {
+    public void onAddQuestionButtonClicked(final View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("New Question");
 
@@ -112,5 +112,10 @@ public class QuestionListActivity extends AppCompatActivity {
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    public void onSynopsisButtonClicked(View view) {
+        Intent intent = new Intent(getApplicationContext(), SynopsisActivity.class);
+        startActivity(intent);
     }
 }

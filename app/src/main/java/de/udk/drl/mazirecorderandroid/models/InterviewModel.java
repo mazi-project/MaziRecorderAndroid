@@ -15,13 +15,14 @@ import java.util.Date;
 
 public class InterviewModel {
 
-    public String _id;
-    public Date creationDate;
-    public String name = "test";
-    public String role = "test";
-    public String text;
+    public int _id = -1;
+    public String name = "";
+    public String role = "";
+    public String text = "";
     public ArrayList<AttachmentModel> attachments = new ArrayList<>();
-    public Uri imageUrl;
+    public String imageFile = "null";
+
+    public String serverId = null;
 
     @Override
     public boolean equals(Object object)
@@ -29,7 +30,7 @@ public class InterviewModel {
         if (object != null && object instanceof InterviewModel)
         {
             InterviewModel model = (InterviewModel) object;
-            return this._id.equals(model._id);
+            return this._id == model._id;
         }
         return false;
     }

@@ -10,12 +10,42 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.udk.drl.mazirecorderandroid.activities.MainActivity">
 
+    <LinearLayout
+        android:id="@+id/bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/padding">
+
+        <Button
+            android:id="@+id/add_question_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add&#10;Question"
+            android:background="@color/colorButtonDark"
+            android:onClick="onAddQuestionButtonClicked"
+            style="@style/textButtonStyle"/>
+
+
+        <Button
+            android:id="@+id/synopsis_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Write&#10;Synopsis"
+            android:onClick="onSynopsisButtonClicked"
+            android:background="@color/colorDone"
+            style="@style/textButtonStyle"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginBottom="@dimen/fab_spacing">
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/bottom_layout">
 
         <TextView
             android:layout_width="match_parent"
@@ -37,15 +67,5 @@
             style="@style/descriptionText"/>
 
     </LinearLayout>
-
-    <Button
-        android:id="@+id/fab"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:text="New Question"
-        android:onClick="onFabButtonClicked"
-        style="@style/textButtonStyle"/>
 
 </RelativeLayout>
