@@ -24,7 +24,7 @@ public class InterviewModel {
     public String role = "";
     public String text = "";
     public ArrayList<AttachmentModel> attachments = new ArrayList<>();
-    public String imageFile = "";
+    public String imageFile = null;
 
     public String serverId = null;
     public boolean isNew = true;

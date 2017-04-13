@@ -55,9 +55,9 @@
                     android:layout_marginRight="@dimen/spacing"
                     android:layout_marginLeft="@dimen/spacing"
                     android:layout_marginTop="@dimen/spacing"
-                    android:lines="6"
                     android:maxLength="1024"
-                    android:hint="Synopsis"/>
+                    android:gravity="top"
+                    android:hint="Write synopsis here"/>
 
                 <RelativeLayout
                     android:layout_width="200dp"

@@ -1,5 +1,6 @@
 package de.udk.drl.mazirecorderandroid.activities;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -11,6 +12,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -33,12 +36,16 @@ import de.udk.drl.mazirecorderandroid.utils.Utils;
 import io.reactivex.Maybe;
 import io.reactivex.MaybeObserver;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Observer;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 
 public class SynopsisActivity extends BaseActivity {
@@ -57,6 +64,12 @@ public class SynopsisActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_synopsis);
+
+        // request permissions
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, PERMISSIONS_SYNOPSIS, REQUEST_SYNOPSIS_PERMISSIONS);
+        }
 
         interviewStorage = InterviewStorage.getInstance();
 
@@ -78,47 +91,30 @@ public class SynopsisActivity extends BaseActivity {
 
 
         // update image
-        Single<Bitmap> loadBitmapObservable = Single.fromCallable(new Callable<Bitmap>() {
+        interviewSubscription = interviewStorage.skipWhile(new Predicate<InterviewModel>() {
             @Override
-            public Bitmap call() throws Exception {
-                if (interviewStorage.interview.imageFile != null && Utils.fileExists(interviewStorage.interview.imageFile)) {
-                    Bitmap bmp = BitmapFactory.decodeFile(interviewStorage.interview.imageFile);
-                    Bitmap scaledBmp = Utils.scaleBitmap(bmp, 256, 256);
-                    return scaledBmp;
-                }
-                throw new Error("Interview does not contain any image");
+            public boolean test(InterviewModel interviewModel) throws Exception {
+                return interviewModel.imageFile == null;
             }
+        }).map(new Function<InterviewModel, String>() {
+            @Override
+            public String apply(InterviewModel interviewModel) throws Exception {
+                return interviewModel.imageFile;
+            }
+        }).distinctUntilChanged().map(new Function<String, Bitmap>() {
+            @Override
+            public Bitmap apply(String path) throws Exception {
+                Bitmap bmp = BitmapFactory.decodeFile(path);
+                Bitmap scaledBmp = Utils.scaleBitmap(bmp, 256, 256);
+                return scaledBmp;
+            }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Consumer<Bitmap>() {
+                @Override
+                public void accept(Bitmap bitmap) throws Exception {
+                    pictureView.setImageBitmap(bitmap);
+                }
         });
-
-//        interviewSubscription = interviewStorage.distinct(new Function<InterviewModel, InterviewModel>() {
-//            @Override
-//            public InterviewModel apply(InterviewModel interviewModel) throws Exception {
-//                return interviewModel;
-//            }
-//        }).onErrorReturn(new Function<Throwable, InterviewModel>() {
-//            @Override
-//            public InterviewModel apply(Throwable throwable) throws Exception {
-//                return null;
-//            }
-//        })..subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribe(new SingleObserver<Bitmap>() {
-//                @Override
-//                public void onSubscribe(Disposable d) {
-//
-//                }
-//
-//                @Override
-//                public void onSuccess(Bitmap value) {
-//                    pictureView.setImageBitmap(value);
-//                }
-//
-//                @Override
-//                public void onError(Throwable e) {
-//
-//                }
-//            });
-
 
     }
 
@@ -128,46 +124,9 @@ public class SynopsisActivity extends BaseActivity {
         if (editTextSubscription != null && !editTextSubscription.isDisposed()) {
             editTextSubscription.dispose();
         }
-//        if (interviewSubscription != null && !interviewSubscription.isDisposed()) {
-//            interviewSubscription.dispose();
-//        }
-    }
-
-    public void updateUi() {
-
-//        final ImageView pictureView = (ImageView) findViewById(R.id.picture_view);
-//
-//        Single<Bitmap> loadBitmapObservable = Single.fromCallable(new Callable<Bitmap>() {
-//            @Override
-//            public Bitmap call() throws Exception {
-//                if (interviewStorage.interview.imageFile != null && Utils.fileExists(interviewStorage.interview.imageFile)) {
-//                    Bitmap bmp = BitmapFactory.decodeFile(interviewStorage.interview.imageFile);
-//                    Bitmap scaledBmp = Utils.scaleBitmap(bmp, 256, 256);
-//                    return scaledBmp;
-//                }
-//                throw new Error("Interview does not contain any image");
-//            }
-//        });
-//
-//        loadBitmapObservable.subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribe(new SingleObserver<Bitmap>() {
-//                    @Override
-//                    public void onSubscribe(Disposable d) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onSuccess(Bitmap value) {
-//                        pictureView.setImageBitmap(value);
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//
-//                    }
-//                });
-
+        if (interviewSubscription != null && !interviewSubscription.isDisposed()) {
+            interviewSubscription.dispose();
+        }
     }
 
     public void onUploadButtonClicked(View view) {
@@ -224,7 +183,6 @@ public class SynopsisActivity extends BaseActivity {
             if (imageFile.exists()) {
                 interviewStorage.interview.imageFile = imageFile.getAbsolutePath();
                 interviewStorage.save();
-                updateUi();
             }
 
         } else {

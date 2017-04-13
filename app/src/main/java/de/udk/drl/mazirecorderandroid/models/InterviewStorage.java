@@ -8,6 +8,7 @@ import org.reactivestreams.Subscription;
 
 import io.reactivex.Observable;
 import io.reactivex.Observer;
+import io.reactivex.subjects.BehaviorSubject;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 
@@ -23,7 +24,7 @@ public class InterviewStorage extends Observable<InterviewModel> {
     public static final String INTERVIEW_STORAGE_ITEM = "interview";
     public InterviewModel interview = null;
 
-    Subject<InterviewModel> observable = PublishSubject.create();
+    Subject<InterviewModel> observable = BehaviorSubject.create();
 
     public InterviewStorage(SharedPreferences storage) {
         this.storage = storage;
@@ -67,7 +68,6 @@ public class InterviewStorage extends Observable<InterviewModel> {
         } else {
             interview = new InterviewModel();
         }
-        // why is this value not send through
         observable.onNext(interview);
 
     }

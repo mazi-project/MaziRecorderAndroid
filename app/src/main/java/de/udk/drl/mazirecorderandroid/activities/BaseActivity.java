@@ -27,8 +27,8 @@ public class BaseActivity extends AppCompatActivity {
     public static final String APP_STRING = "de.udk.drl.mazirecorderandroid";
 
     // Storage Permissions
-    protected static final int REQUEST_STORY_PERMISSIONS = 1;
-    protected static String[] PERMISSIONS_STORY = {
+    protected static final int REQUEST_SYNOPSIS_PERMISSIONS = 1;
+    protected static String[] PERMISSIONS_SYNOPSIS = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA
@@ -60,7 +60,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
 
-    public void showAlert(final String title,final String message,  final boolean finishAfter) {
+    public void showAlert(final String title,final String message, final boolean finishAfter) {
 
         AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         alertDialog.setTitle(title);
@@ -83,7 +83,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case REQUEST_STORY_PERMISSIONS: {
+            case REQUEST_SYNOPSIS_PERMISSIONS: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
