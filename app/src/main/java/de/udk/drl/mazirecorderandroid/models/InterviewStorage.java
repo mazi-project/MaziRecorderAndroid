@@ -4,23 +4,31 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 
+import org.reactivestreams.Subscription;
+
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
+
 /**
  * Created by lutz on 11/04/17.
  */
 
-public class InterviewStorage {
+public class InterviewStorage extends Observable<InterviewModel> {
 
     private static InterviewStorage instance = null;
 
     private SharedPreferences storage;
     public static final String INTERVIEW_STORAGE_ITEM = "interview";
-    public InterviewModel interview = new InterviewModel();
+    public InterviewModel interview = null;
+
+    Subject<InterviewModel> observable = PublishSubject.create();
 
     public InterviewStorage(SharedPreferences storage) {
         this.storage = storage;
-        loadFromStorage();
+        load();
     }
-
 
     public static InterviewStorage getInstance() {
         if (instance == null) {
@@ -35,11 +43,14 @@ public class InterviewStorage {
         }
     }
 
-    public void save() {
-        saveToStorage();
+    public void createNew() {
+        interview = new InterviewModel();
+        observable.onNext(interview);
     }
 
-    private void saveToStorage() {
+    public void save() {
+        interview.isNew = false;
+        observable.onNext(interview);
         SharedPreferences.Editor prefsEditor = storage.edit();
         Gson gson = new Gson();
         String json = gson.toJson(interview);
@@ -47,12 +58,24 @@ public class InterviewStorage {
         prefsEditor.commit();
     }
 
-    private void loadFromStorage() {
+    public void load() {
         // load from storage
         if (storage.contains(INTERVIEW_STORAGE_ITEM)) {
             Gson gson = new Gson();
             String json = storage.getString(INTERVIEW_STORAGE_ITEM, "");
             interview = gson.fromJson(json, InterviewModel.class);
+        } else {
+            interview = new InterviewModel();
         }
+        // why is this value not send through
+        observable.onNext(interview);
+
     }
+
+    @Override
+    protected void subscribeActual(Observer<? super InterviewModel> observer) {
+        observable.subscribe(observer);
+    }
+
+
 }

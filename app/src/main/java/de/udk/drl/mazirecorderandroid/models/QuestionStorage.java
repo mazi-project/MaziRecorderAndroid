@@ -25,8 +25,7 @@ public class QuestionStorage {
     protected QuestionStorage(SharedPreferences storage) {
         questions = new ArrayList<>();
         this.storage = storage;
-        loadFromStorage();
-
+        load();
     }
 
     public static QuestionStorage getInstance() {
@@ -48,15 +47,15 @@ public class QuestionStorage {
 
     public void add(QuestionModel question) {
         questions.add(question);
-        saveToStorage();
+        save();
     }
 
     public void delete(int index) {
         questions.remove(index);
-        saveToStorage();
+        load();
     }
 
-    private void saveToStorage() {
+    private void save() {
         SharedPreferences.Editor prefsEditor = storage.edit();
         Gson gson = new Gson();
         String json = gson.toJson(questions.toArray());
@@ -64,7 +63,7 @@ public class QuestionStorage {
         prefsEditor.commit();
     }
 
-    private void loadFromStorage() {
+    private void load() {
         // load from storage
         if (storage.contains(QUESTION_STORAGE_ITEM)) {
             Gson gson = new Gson();

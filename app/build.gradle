@@ -19,9 +19,6 @@ android {
     }
     productFlavors {
     }
-    dataBinding {
-        enabled = true
-    }
 }
 
 dependencies {
@@ -31,6 +28,7 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    compile 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
     compile 'com.google.code.gson:gson:2.7'
     compile 'com.android.support:design:23.4.0'
     compile 'com.squareup.retrofit2:retrofit:2.1.0'

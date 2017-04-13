@@ -10,9 +10,29 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="de.udk.drl.mazirecorderandroid.activities.MainActivity">
 
+    <LinearLayout
+        android:id="@+id/bottom_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/padding">
+
+        <Button
+            android:id="@+id/continueButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/spacing"
+            android:text="Start Interview"
+            android:background="@color/colorDone"
+            android:onClick="onContinueButtonClicked"
+            style="@style/textButtonStyle"/>
+
+    </LinearLayout>
+
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_layout">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -49,21 +69,12 @@
                 android:hint="Role"/>
 
             <Button
-                android:id="@+id/continueButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/spacing"
-                android:text="Continue Interview"
-                android:onClick="onContinueButtonClicked"
-                style="@style/textButtonStyle"/>
-
-            <Button
                 android:id="@+id/newButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/spacing"
                 android:text="New Interview"
-                android:onClick="onStartButtonClicked"
+                android:onClick="onNewButtonClicked"
                 style="@style/textButtonStyle"/>
 
         </LinearLayout>

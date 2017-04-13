@@ -9,30 +9,23 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Date;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
+
 /**
  * Created by lutz on 11/04/17.
  */
 
 public class InterviewModel {
 
-    public int _id = -1;
     public String name = "";
     public String role = "";
     public String text = "";
     public ArrayList<AttachmentModel> attachments = new ArrayList<>();
-    public String imageFile = "null";
+    public String imageFile = "";
 
     public String serverId = null;
-
-    @Override
-    public boolean equals(Object object)
-    {
-        if (object != null && object instanceof InterviewModel)
-        {
-            InterviewModel model = (InterviewModel) object;
-            return this._id == model._id;
-        }
-        return false;
-    }
-
+    public boolean isNew = true;
 }
