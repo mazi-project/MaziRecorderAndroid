@@ -85,13 +85,6 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        ((TextView)findViewById(R.id.edit_text_name)).setText(interviewStorage.interview.name);
-        ((TextView)findViewById(R.id.edit_text_role)).setText(interviewStorage.interview.role);
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         if (editTextSubscription != null && !editTextSubscription.isDisposed()) {

@@ -18,6 +18,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -81,14 +82,14 @@ public class SynopsisActivity extends BaseActivity {
         final Observable<CharSequence> editTextObservable = RxTextView.textChanges(editTextSynopsis);
 
         // save synopsis to interview model
-        editTextSubscription = editTextObservable.debounce(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<CharSequence>() {
-            @Override
-            public void accept(CharSequence charSequence) throws Exception {
-                interviewStorage.interview.text = charSequence.toString();
-                interviewStorage.save();
-            }
-        });
-
+        editTextSubscription = editTextObservable.debounce(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<CharSequence>() {
+                    @Override
+                    public void accept(CharSequence charSequence) throws Exception {
+                        interviewStorage.interview.text = charSequence.toString();
+                        interviewStorage.save();
+                    }
+                });
 
         // update image
         interviewSubscription = interviewStorage.skipWhile(new Predicate<InterviewModel>() {
@@ -108,12 +109,11 @@ public class SynopsisActivity extends BaseActivity {
                 Bitmap scaledBmp = Utils.scaleBitmap(bmp, 256, 256);
                 return scaledBmp;
             }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Consumer<Bitmap>() {
-                @Override
-                public void accept(Bitmap bitmap) throws Exception {
-                    pictureView.setImageBitmap(bitmap);
-                }
+        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Bitmap>() {
+            @Override
+            public void accept(Bitmap bitmap) throws Exception {
+                pictureView.setImageBitmap(bitmap);
+            }
         });
 
     }
@@ -131,6 +131,8 @@ public class SynopsisActivity extends BaseActivity {
 
     public void onUploadButtonClicked(View view) {
         this.interviewStorage.save();
+
+        showOverlay("Interview is getting uploaded...",(ViewGroup)findViewById(R.id.main_layout));
     }
 
     public void onImageButtonClicked(View view) {

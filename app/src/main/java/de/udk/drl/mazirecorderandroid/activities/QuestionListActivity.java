@@ -12,19 +12,29 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+
 import de.udk.drl.mazirecorderandroid.adapters.QuestionAdapter;
 import de.udk.drl.mazirecorderandroid.models.AttachmentModel;
+import de.udk.drl.mazirecorderandroid.models.InterviewModel;
 import de.udk.drl.mazirecorderandroid.models.InterviewStorage;
 import de.udk.drl.mazirecorderandroid.models.QuestionModel;
 import de.udk.drl.mazirecorderandroid.models.QuestionStorage;
 
 import de.udk.drl.mazirecorderandroid.R;
+import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
 public class QuestionListActivity extends AppCompatActivity {
 
     private QuestionStorage questionStorage;
     private InterviewStorage interviewStorage;
     private ListView questionListView;
+
+    private Disposable questionSubscriber;
 
     public static int ATTACHMENT_REQUEST_CODE = 1;
 
@@ -42,12 +52,28 @@ public class QuestionListActivity extends AppCompatActivity {
         TextView emptyText = (TextView)findViewById(R.id.empty_text);
         questionListView.setEmptyView(emptyText);
 
-        updateUi();
+        // update list on question change
+        questionSubscriber = Observable.combineLatest(questionStorage, interviewStorage,
+                new BiFunction<ArrayList<QuestionModel>, InterviewModel, ArrayList<QuestionModel>>() {
+                    @Override
+                    public ArrayList<QuestionModel> apply(ArrayList<QuestionModel> questionModels, InterviewModel interviewModel) throws Exception {
+                        return questionModels;
+                    }
+                }).subscribe(new Consumer<ArrayList<QuestionModel>>() {
+                    @Override
+                    public void accept(ArrayList<QuestionModel> questionModels) throws Exception {
+                        QuestionAdapter adapter = new QuestionAdapter(QuestionListActivity.this, R.layout.item_question, questionModels);
+                        questionListView.setAdapter(adapter);
+                    }
+                });
     }
 
-    public void updateUi() {
-        QuestionAdapter adapter = new QuestionAdapter(this, R.layout.item_question, questionStorage.getAll());
-        questionListView.setAdapter(adapter);
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (questionSubscriber != null && !questionSubscriber.isDisposed()) {
+            questionSubscriber.dispose();
+        }
     }
 
     public void onAddQuestionButtonClicked(final View view) {
@@ -66,7 +92,6 @@ public class QuestionListActivity extends AppCompatActivity {
                 QuestionModel question = new QuestionModel();
                 question.text = input.getText().toString();
                 questionStorage.add(question);
-                updateUi();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -82,7 +107,6 @@ public class QuestionListActivity extends AppCompatActivity {
     public void onItemDeleteButtonClicked(View view) {
         int index = (int)view.getTag();
         questionStorage.delete(index);
-        updateUi();
     }
 
     public void onListItemClicked(View view) {
@@ -106,8 +130,6 @@ public class QuestionListActivity extends AppCompatActivity {
                 interviewStorage.interview.attachments.add(attachment);
                 interviewStorage.save();
             }
-
-            updateUi();
 
         } else {
             super.onActivityResult(requestCode, resultCode, data);

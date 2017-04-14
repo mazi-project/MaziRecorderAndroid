@@ -56,14 +56,11 @@ public class QuestionAdapter extends ArrayAdapter<QuestionModel> {
                 }
             }
         }
-
         textView.setTag(question);
 
         // supply position for deletion
         View button = view.findViewById(R.id.question_delete_button);
         button.setTag(position);
-
-        //view.findViewById(R.id.question_delete_button).setTag(VIEW_TAG_INDEX,position);
 
 
         return view;

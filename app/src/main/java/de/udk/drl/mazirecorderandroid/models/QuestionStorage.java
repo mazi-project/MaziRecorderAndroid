@@ -8,12 +8,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.subjects.BehaviorSubject;
+import io.reactivex.subjects.Subject;
 
 /**
  * Created by lutz on 11/04/17.
  */
 
-public class QuestionStorage {
+public class QuestionStorage extends Observable<ArrayList<QuestionModel>> {
 
     private static QuestionStorage instance = null;
 
@@ -22,8 +25,9 @@ public class QuestionStorage {
 
     public ArrayList<QuestionModel> questions;
 
+    Subject<ArrayList<QuestionModel>> observable = BehaviorSubject.create();
+
     protected QuestionStorage(SharedPreferences storage) {
-        questions = new ArrayList<>();
         this.storage = storage;
         load();
     }
@@ -52,7 +56,7 @@ public class QuestionStorage {
 
     public void delete(int index) {
         questions.remove(index);
-        load();
+        save();
     }
 
     private void save() {
@@ -61,6 +65,7 @@ public class QuestionStorage {
         String json = gson.toJson(questions.toArray());
         prefsEditor.putString(QUESTION_STORAGE_ITEM, json);
         prefsEditor.commit();
+        observable.onNext(questions);
     }
 
     private void load() {
@@ -70,7 +75,15 @@ public class QuestionStorage {
             String json = storage.getString(QUESTION_STORAGE_ITEM, "");
             QuestionModel[] models = gson.fromJson(json, QuestionModel[].class);
             questions = new ArrayList<>(Arrays.asList(models));
+        } else {
+            questions = new ArrayList<>();
         }
+        observable.onNext(questions);
+    }
+
+    @Override
+    protected void subscribeActual(Observer<? super ArrayList<QuestionModel>> observer) {
+        observable.subscribe(observer);
     }
 }
 
