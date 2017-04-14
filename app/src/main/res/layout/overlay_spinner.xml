@@ -4,7 +4,7 @@
     android:id="@+id/spinner_overlay"
     android:animateLayoutChanges="true"
     android:visibility="gone"
-    android:background="#c8000000"
+    android:background="#e2000000"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clickable="true">
@@ -30,7 +30,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:textColor="@color/colorTextLight"/>
+            android:textColor="@color/colorTextLight"
+            style="@style/normalText"/>
 
     </LinearLayout>
 
