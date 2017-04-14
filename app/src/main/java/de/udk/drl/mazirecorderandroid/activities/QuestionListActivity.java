@@ -31,13 +31,11 @@ import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
-public class QuestionListActivity extends AppCompatActivity {
+public class QuestionListActivity extends BaseActivity {
 
     private QuestionStorage questionStorage;
     private InterviewStorage interviewStorage;
     private ListView questionListView;
-
-    private Disposable questionSubscriber;
 
     public static int ATTACHMENT_REQUEST_CODE = 1;
 
@@ -56,7 +54,8 @@ public class QuestionListActivity extends AppCompatActivity {
         questionListView.setEmptyView(emptyText);
 
         // update list on question change
-        questionSubscriber = Observable.combineLatest(questionStorage, interviewStorage,
+        subscribers.add(
+            Observable.combineLatest(questionStorage, interviewStorage,
                 new BiFunction<ArrayList<QuestionModel>, InterviewModel, ArrayList<QuestionModel>>() {
                     @Override
                     public ArrayList<QuestionModel> apply(ArrayList<QuestionModel> questionModels, InterviewModel interviewModel) throws Exception {
@@ -68,15 +67,8 @@ public class QuestionListActivity extends AppCompatActivity {
                         QuestionAdapter adapter = new QuestionAdapter(QuestionListActivity.this, R.layout.item_question, questionModels);
                         questionListView.setAdapter(adapter);
                     }
-                });
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (questionSubscriber != null && !questionSubscriber.isDisposed()) {
-            questionSubscriber.dispose();
-        }
+                })
+        );
     }
 
     public void onAddQuestionButtonClicked(final View view) {

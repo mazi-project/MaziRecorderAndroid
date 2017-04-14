@@ -2,13 +2,11 @@ package de.udk.drl.mazirecorderandroid.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import de.udk.drl.mazirecorderandroid.models.InterviewModel;
@@ -16,23 +14,14 @@ import de.udk.drl.mazirecorderandroid.models.InterviewStorage;
 import de.udk.drl.mazirecorderandroid.models.QuestionStorage;
 
 import de.udk.drl.mazirecorderandroid.R;
-import de.udk.drl.mazirecorderandroid.models.SharedPreferencesStorage;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
-import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function3;
-import io.reactivex.internal.functions.ObjectHelper;
-import io.reactivex.observables.ConnectableObservable;
 
 public class MainActivity extends BaseActivity {
 
     public InterviewStorage interviewStorage;
-
-    private Disposable editTextSubscription = null;
-    private Disposable interviewSubscription = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +44,8 @@ public class MainActivity extends BaseActivity {
         final Observable<CharSequence> editNameObservable = RxTextView.textChanges(editTextName);
         Observable<CharSequence> editRoleObservable = RxTextView.textChanges(editTextRole);
 
-        editTextSubscription = Observable.combineLatest(editNameObservable, editRoleObservable,
+        subscribers.add(
+            Observable.combineLatest(editNameObservable, editRoleObservable,
                 new BiFunction<CharSequence, CharSequence, Boolean>() {
                     @Override
                     public Boolean apply(CharSequence name, CharSequence role) throws Exception {
@@ -66,11 +56,18 @@ public class MainActivity extends BaseActivity {
                     public void accept(Boolean b) throws Exception {
                         continueButton.setEnabled(b);
                     }
-                });
+                })
+        );
 
-        interviewSubscription = interviewStorage.subscribe(new Consumer<InterviewModel>() {
+        subscribers.add(
+            interviewStorage.subscribe(new Consumer<InterviewModel>() {
                 @Override
                 public void accept(InterviewModel model) throws Exception {
+                    if (model.isNew) {
+                        continueButton.setText("START INTEFVIEW");
+                    } else {
+                        continueButton.setText("CONTINUE INTERVIEW");
+                    }
                     newButton.setEnabled(!model.isNew);
                     editTextName.setEnabled(model.isNew);
                     editTextRole.setEnabled(model.isNew);
@@ -78,24 +75,13 @@ public class MainActivity extends BaseActivity {
                     editTextName.setText(interviewStorage.interview.name);
                     editTextRole.setText(interviewStorage.interview.role);
                 }
-        });
+            })
+        );
 
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (editTextSubscription != null && !editTextSubscription.isDisposed()) {
-            editTextSubscription.dispose();
-        }
-        if (interviewSubscription != null && !interviewSubscription.isDisposed()) {
-            interviewSubscription.dispose();
-        }
     }
 
     public void onNewButtonClicked(View view) {
         interviewStorage.createNew();
-        interviewStorage.save();
     }
 
     public void onContinueButtonClicked(View view) {

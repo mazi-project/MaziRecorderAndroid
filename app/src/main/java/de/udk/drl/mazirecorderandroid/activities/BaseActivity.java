@@ -19,7 +19,10 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+
 import de.udk.drl.mazirecorderandroid.R;
+import io.reactivex.disposables.Disposable;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -28,6 +31,8 @@ public class BaseActivity extends AppCompatActivity {
     public static final int MIN_INPUT_LENGTH = 3;
 
     public static final String APP_STRING = "de.udk.drl.mazirecorderandroid";
+
+    protected ArrayList<Disposable> subscribers = new ArrayList<>();
 
     // Storage Permissions
     protected static final int REQUEST_SYNOPSIS_PERMISSIONS = 1;
@@ -48,6 +53,16 @@ public class BaseActivity extends AppCompatActivity {
     protected static String[] PERMISSIONS_CAMERA = {
             Manifest.permission.CAMERA
     };
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        for (Disposable subscriber : subscribers) {
+            if (!subscriber.isDisposed())
+                subscriber.dispose();
+        }
+    }
 
     public void showOverlay(String text, ViewGroup parent) {
         LayoutInflater inflater = this.getLayoutInflater();

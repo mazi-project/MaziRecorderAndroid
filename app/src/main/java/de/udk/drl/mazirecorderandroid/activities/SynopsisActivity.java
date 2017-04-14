@@ -26,7 +26,9 @@ import android.widget.ImageView;
 import com.jakewharton.rxbinding2.widget.RxTextView;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -59,10 +61,6 @@ public class SynopsisActivity extends BaseActivity {
     public File imageFile;
     private InterviewStorage interviewStorage;
 
-    private Disposable interviewImageSubscription = null;
-    private Disposable interviewButtonSubscription = null;
-    private Disposable editTextSubscription = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,62 +83,54 @@ public class SynopsisActivity extends BaseActivity {
         final Observable<CharSequence> editTextObservable = RxTextView.textChanges(editTextSynopsis);
 
         // save synopsis to interview model
-        editTextSubscription = editTextObservable.debounce(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
+        subscribers.add(
+                editTextObservable.debounce(1, TimeUnit.SECONDS).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<CharSequence>() {
                     @Override
                     public void accept(CharSequence charSequence) throws Exception {
                         interviewStorage.interview.text = charSequence.toString();
                         interviewStorage.save();
                     }
-                });
+                })
+        );
 
         // update image
-        interviewImageSubscription = interviewStorage.map(new Function<InterviewModel, String>() {
-            @Override
-            public String apply(InterviewModel interviewModel) throws Exception {
-                return interviewModel.imageFile;
-            }
-        }).retry().distinctUntilChanged().map(new Function<String, Bitmap>() {
-            @Override
-            public Bitmap apply(String path) throws Exception {
-                Bitmap bmp = BitmapFactory.decodeFile(path);
-                Bitmap scaledBmp = Utils.scaleBitmap(bmp, 256, 256);
-                return scaledBmp;
-            }
-        }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Bitmap>() {
-            @Override
-            public void accept(Bitmap bitmap) throws Exception {
-                pictureView.setImageBitmap(bitmap);
-            }
-        });
+        subscribers.add(
+            interviewStorage.map(new Function<InterviewModel, String>() {
+                @Override
+                public String apply(InterviewModel interviewModel) throws Exception {
+                    return interviewModel.imageFile;
+                }
+            }).retry().distinctUntilChanged().map(new Function<String, Bitmap>() {
+                @Override
+                public Bitmap apply(String path) throws Exception {
+                    Bitmap bmp = BitmapFactory.decodeFile(path);
+                    Bitmap scaledBmp = Utils.scaleBitmap(bmp, 256, 256);
+                    return scaledBmp;
+                }
+            }).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Bitmap>() {
+                @Override
+                public void accept(Bitmap bitmap) throws Exception {
+                    pictureView.setImageBitmap(bitmap);
+                }
+            })
+        );
 
         //set upload button state
-        interviewButtonSubscription = interviewStorage.map(new Function<InterviewModel, Boolean>() {
-            @Override
-            public Boolean apply(InterviewModel interviewModel) throws Exception {
-                return (interviewModel.text.length() >= MIN_INPUT_LENGTH && interviewModel.imageFile != null);
-            }
-        }).subscribe(new Consumer<Boolean>() {
-            @Override
-            public void accept(Boolean enable) throws Exception {
-                uploadButton.setEnabled(enable);
-            }
-        });
+        subscribers.add(
+            interviewStorage.map(new Function<InterviewModel, Boolean>() {
+                @Override
+                public Boolean apply(InterviewModel interviewModel) throws Exception {
+                    return (interviewModel.text.length() >= MIN_INPUT_LENGTH && interviewModel.imageFile != null);
+                }
+            }).subscribe(new Consumer<Boolean>() {
+                @Override
+                public void accept(Boolean enable) throws Exception {
+                    uploadButton.setEnabled(enable);
+                }
+            })
+        );
 
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (editTextSubscription != null && !editTextSubscription.isDisposed()) {
-            editTextSubscription.dispose();
-        }
-        if (interviewImageSubscription != null && !interviewImageSubscription.isDisposed()) {
-            interviewImageSubscription.dispose();
-        }
-        if (interviewButtonSubscription != null && !interviewButtonSubscription.isDisposed()) {
-            interviewButtonSubscription.dispose();
-        }
     }
 
     public void onUploadButtonClicked(View view) {

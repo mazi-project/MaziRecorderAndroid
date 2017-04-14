@@ -24,15 +24,21 @@ import java.io.IOException;
 import de.udk.drl.mazirecorderandroid.models.AttachmentModel;
 import de.udk.drl.mazirecorderandroid.recorder.SoundRecorder;
 import de.udk.drl.mazirecorderandroid.recorder.SoundRecorderWav;
+import de.udk.drl.mazirecorderandroid.utils.ObservableProperty;
 import de.udk.drl.mazirecorderandroid.view.WaveformView;
 
 import de.udk.drl.mazirecorderandroid.R;
+import io.reactivex.functions.Consumer;
 
 public class RecorderActivity extends BaseActivity {
 
+    public enum RecorderState {
+        INIT, RECORDING, STOPPED
+    }
+
     public static final int RECORDING_MAX_TIME = 1000 * 60 * 5;
 
-    RecorderState state = RecorderState.INIT;
+    ObservableProperty<RecorderState> state = new ObservableProperty<>(RecorderState.INIT);
 
     CountDownTimer timer = null;
     long recordTime = 0;
@@ -43,10 +49,6 @@ public class RecorderActivity extends BaseActivity {
     ProgressBar progressBar;
 
     PowerManager.WakeLock wakeLock;
-
-    public enum RecorderState {
-        INIT, RECORDING, STOPPED
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +85,39 @@ public class RecorderActivity extends BaseActivity {
         // keep screen always on
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        updateUi();
+        final TextView textView = (TextView) findViewById(R.id.text_view);
+        final View saveButton = findViewById(R.id.save_button);
+        final View cancelButton = findViewById(R.id.cancel_button);
+        final ToggleButton recordButton = (ToggleButton) findViewById(R.id.record_button);
+
+        // update ui according to recorder state
+        subscribers.add(
+            state.distinctUntilChanged().subscribe(new Consumer<RecorderState>() {
+                @Override
+                public void accept(RecorderState state) throws Exception {
+                    if (state == RecorderState.RECORDING) {
+                        textView.setText("Stop Recording");
+                        saveButton.setVisibility(View.INVISIBLE);
+                        cancelButton.setVisibility(View.INVISIBLE);
+                        recordButton.setChecked(true);
+                    } else if (state == RecorderState.STOPPED) {
+                        textView.setText("Continue Recording");
+                        saveButton.setVisibility(View.VISIBLE);
+                        cancelButton.setVisibility(View.VISIBLE);
+                        recordButton.setChecked(false);
+                        waveformView.clearAudioData();
+                    } else {
+                        textView.setText("Start Recording");
+                        progressBar.setProgress(0);
+                        timerView.setText(convertTimeString(0));
+                        saveButton.setVisibility(View.INVISIBLE);
+                        cancelButton.setVisibility(View.INVISIBLE);
+                        recordButton.setChecked(false);
+                        waveformView.clearAudioData();
+                    }
+                }
+            })
+        );
     }
 
     @Override
@@ -92,7 +126,7 @@ public class RecorderActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         if (wakeLock.isHeld())
             wakeLock.release();
@@ -124,14 +158,12 @@ public class RecorderActivity extends BaseActivity {
         try {
             recorder.prepare();
             recorder.startRecording();
-            state = RecorderState.RECORDING;
+            state.set(RecorderState.RECORDING);
             wakeLock.acquire();
         } catch (Exception e) {
             showAlert("Error", e.getMessage());
             stopRecording();
         }
-
-        updateUi();
     }
 
     public void stopRecording() {
@@ -144,13 +176,11 @@ public class RecorderActivity extends BaseActivity {
 
         try {
             recorder.stopRecording();
-            state = RecorderState.STOPPED;
+            state.set(RecorderState.STOPPED);
             wakeLock.release();
         } catch (IOException e) {
             showAlert("Error", e.getMessage());
         }
-
-        updateUi();
     }
 
     public void resetRecording() {
@@ -165,12 +195,10 @@ public class RecorderActivity extends BaseActivity {
 
         try {
             recorder.reset();
-            state = RecorderState.INIT;
+            state.set(RecorderState.INIT);
         } catch (IOException e) {
             showAlert("Error", e.getMessage());
         }
-
-        updateUi();
     }
 
     public File saveRecording() {
@@ -187,46 +215,17 @@ public class RecorderActivity extends BaseActivity {
         return file;
     }
 
-    private void updateUi() {
-
-        TextView textView = (TextView) findViewById(R.id.text_view);
-        View saveButton = findViewById(R.id.save_button);
-        View cancelButton = findViewById(R.id.cancel_button);
-        ToggleButton recordButton = (ToggleButton) findViewById(R.id.record_button);
-
-        if (state == RecorderState.RECORDING) {
-            textView.setText("Stop Recording");
-            saveButton.setVisibility(View.INVISIBLE);
-            cancelButton.setVisibility(View.INVISIBLE);
-            recordButton.setChecked(true);
-        } else if (state == RecorderState.STOPPED) {
-            textView.setText("Continue Recording");
-            saveButton.setVisibility(View.VISIBLE);
-            cancelButton.setVisibility(View.VISIBLE);
-            recordButton.setChecked(false);
-            waveformView.clearAudioData();
-        } else {
-            textView.setText("Start Recording");
-            progressBar.setProgress(0);
-            timerView.setText(convertTimeString(0));
-            saveButton.setVisibility(View.INVISIBLE);
-            cancelButton.setVisibility(View.INVISIBLE);
-            recordButton.setChecked(false);
-            waveformView.clearAudioData();
-        }
-    }
-
     public void onRecordButtonClicked(View view) {
-        if (state == RecorderState.INIT)
+        if (state.get() == RecorderState.INIT)
             startRecording();
-        else if (state == RecorderState.STOPPED) {
+        else if (state.get() == RecorderState.STOPPED) {
             startRecording();
-        } else if (state == RecorderState.RECORDING)
+        } else if (state.get() == RecorderState.RECORDING)
             stopRecording();
     }
 
     public void onSaveButtonClicked(View view) {
-        if (state == RecorderState.STOPPED) {
+        if (state.get() == RecorderState.STOPPED) {
             showOverlay("Recording gets saved...",(ViewGroup)findViewById(R.id.main_layout));
             File file = saveRecording();
             if (file != null) {
