@@ -54,6 +54,7 @@ public class QuestionAdapter extends ArrayAdapter<QuestionModel> {
                 } else {
                     textView.setTextAppearance(parent.getContext(), R.style.boldText);
                 }
+                break;
             }
         }
         textView.setTag(question);

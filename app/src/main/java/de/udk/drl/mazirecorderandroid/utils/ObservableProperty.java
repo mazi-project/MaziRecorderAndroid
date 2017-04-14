@@ -14,9 +14,9 @@ public class ObservableProperty<T> extends Observable<T> {
         subject = BehaviorSubject.create();
     }
 
-    public ObservableProperty(T defaultValue) {
-        this.value = defaultValue;
-        subject = BehaviorSubject.create();
+    public ObservableProperty(T value) {
+        this();
+        this.set(value);
     }
 
     public T get() {

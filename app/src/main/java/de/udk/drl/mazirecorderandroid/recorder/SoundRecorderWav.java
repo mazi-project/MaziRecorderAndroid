@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
@@ -16,8 +17,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
-
-import de.udk.drl.mazirecorderandroid.utils.Utils;
 
 /**
  * Created by lutz on 13/04/15.
@@ -175,8 +174,7 @@ public class SoundRecorderWav extends SoundRecorder {
 
         while (recorder.read(buffer, 0, buffer.length) > 0) {
 
-
-            callback.onNewData(Utils.getMaxAbs(buffer));
+            callback.onNewData(getMaxAbs(buffer));
 
             // write buffer to file
             try {
@@ -248,10 +246,10 @@ public class SoundRecorderWav extends SoundRecorder {
         fileWriter.writeInt(Integer.reverseBytes(bytesRecorded)); // Data chunk size not known yet, write 0
     }
 
-    public ArrayList<Integer> getValidSampleRates() {
+    private ArrayList<Integer> getValidSampleRates() {
 
         int sampleRates[] = {8000, 11025, 16000, 22050, 44100};
-        if (Utils.isEmulator())
+        if (isEmulator())
             sampleRates = new int[] { 16000 };
 
         ArrayList<Integer> passedRates =new ArrayList<Integer>();
@@ -263,5 +261,26 @@ public class SoundRecorderWav extends SoundRecorder {
             }
         }
         return passedRates;
+    }
+
+
+    private static boolean isEmulator() {
+        return Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.startsWith("unknown")
+                || Build.MODEL.contains("google_sdk")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                || "google_sdk".equals(Build.PRODUCT);
+    }
+
+    private static int getMaxAbs(short[] array) {
+        int max = 0;
+        for (int i=0;i<array.length; i++ ) {
+            if (Math.abs(array[i]) > max)
+                max = Math.abs(array[i]);
+        }
+        return max;
     }
 }
