@@ -46,17 +46,17 @@ public class InterviewStorage extends Observable<InterviewModel> {
 
     public void createNew() {
         interview = new InterviewModel();
-        observable.onNext(interview);
     }
 
     public void save() {
-        interview.isNew = false;
         observable.onNext(interview);
         SharedPreferences.Editor prefsEditor = storage.edit();
         Gson gson = new Gson();
         String json = gson.toJson(interview);
         prefsEditor.putString(INTERVIEW_STORAGE_ITEM, json);
         prefsEditor.commit();
+
+        interview.isNew = false;
     }
 
     public void load() {

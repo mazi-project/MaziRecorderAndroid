@@ -25,6 +25,8 @@ public class BaseActivity extends AppCompatActivity {
 
     private View overlay;
 
+    public static final int MIN_INPUT_LENGTH = 3;
+
     public static final String APP_STRING = "de.udk.drl.mazirecorderandroid";
 
     // Storage Permissions

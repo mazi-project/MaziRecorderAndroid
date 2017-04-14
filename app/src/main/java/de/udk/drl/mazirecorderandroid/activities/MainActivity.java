@@ -29,8 +29,6 @@ import io.reactivex.observables.ConnectableObservable;
 
 public class MainActivity extends BaseActivity {
 
-    public static final int MIN_INPUT_LENGTH = 3;
-
     public InterviewStorage interviewStorage;
 
     private Disposable editTextSubscription = null;
@@ -97,6 +95,7 @@ public class MainActivity extends BaseActivity {
 
     public void onNewButtonClicked(View view) {
         interviewStorage.createNew();
+        interviewStorage.save();
     }
 
     public void onContinueButtonClicked(View view) {

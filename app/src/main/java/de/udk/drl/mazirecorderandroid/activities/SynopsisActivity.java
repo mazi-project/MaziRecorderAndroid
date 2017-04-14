@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -58,7 +59,8 @@ public class SynopsisActivity extends BaseActivity {
     public File imageFile;
     private InterviewStorage interviewStorage;
 
-    private Disposable interviewSubscription = null;
+    private Disposable interviewImageSubscription = null;
+    private Disposable interviewButtonSubscription = null;
     private Disposable editTextSubscription = null;
 
     @Override
@@ -76,6 +78,7 @@ public class SynopsisActivity extends BaseActivity {
 
         final EditText editTextSynopsis = (EditText) findViewById(R.id.edit_text_synopsis);
         final ImageView pictureView = (ImageView) findViewById(R.id.picture_view);
+        final Button uploadButton = (Button) findViewById(R.id.upload_button);
         editTextSynopsis.setText(interviewStorage.interview.text);
 
         // set up rx patterns
@@ -92,17 +95,12 @@ public class SynopsisActivity extends BaseActivity {
                 });
 
         // update image
-        interviewSubscription = interviewStorage.skipWhile(new Predicate<InterviewModel>() {
-            @Override
-            public boolean test(InterviewModel interviewModel) throws Exception {
-                return interviewModel.imageFile == null;
-            }
-        }).map(new Function<InterviewModel, String>() {
+        interviewImageSubscription = interviewStorage.map(new Function<InterviewModel, String>() {
             @Override
             public String apply(InterviewModel interviewModel) throws Exception {
                 return interviewModel.imageFile;
             }
-        }).distinctUntilChanged().map(new Function<String, Bitmap>() {
+        }).retry().distinctUntilChanged().map(new Function<String, Bitmap>() {
             @Override
             public Bitmap apply(String path) throws Exception {
                 Bitmap bmp = BitmapFactory.decodeFile(path);
@@ -116,6 +114,19 @@ public class SynopsisActivity extends BaseActivity {
             }
         });
 
+        //set upload button state
+        interviewButtonSubscription = interviewStorage.map(new Function<InterviewModel, Boolean>() {
+            @Override
+            public Boolean apply(InterviewModel interviewModel) throws Exception {
+                return (interviewModel.text.length() >= MIN_INPUT_LENGTH && interviewModel.imageFile != null);
+            }
+        }).subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean enable) throws Exception {
+                uploadButton.setEnabled(enable);
+            }
+        });
+
     }
 
     @Override
@@ -124,8 +135,11 @@ public class SynopsisActivity extends BaseActivity {
         if (editTextSubscription != null && !editTextSubscription.isDisposed()) {
             editTextSubscription.dispose();
         }
-        if (interviewSubscription != null && !interviewSubscription.isDisposed()) {
-            interviewSubscription.dispose();
+        if (interviewImageSubscription != null && !interviewImageSubscription.isDisposed()) {
+            interviewImageSubscription.dispose();
+        }
+        if (interviewButtonSubscription != null && !interviewButtonSubscription.isDisposed()) {
+            interviewButtonSubscription.dispose();
         }
     }
 
