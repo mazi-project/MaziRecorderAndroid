@@ -132,7 +132,8 @@ public class SynopsisActivity extends BaseActivity {
     public void onUploadButtonClicked(View view) {
         this.interviewStorage.save();
 
-        showOverlay("Interview is getting uploaded...",(ViewGroup)findViewById(R.id.main_layout));
+        Intent intent = new Intent(this, UploadActivity.class);
+        startActivity(intent);
     }
 
     public void onImageButtonClicked(View view) {

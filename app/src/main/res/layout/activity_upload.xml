@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_upload"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:layout_gravity="center">
+
+    <LinearLayout
+        android:id="@+id/uploading_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/large_spacing"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:indeterminate="true"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/large_spacing"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Interview is getting uploaded. It may take a few minutes."
+            android:textAlignment="center"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/done_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/large_spacing"
+        android:layout_centerInParent="true"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/done"
+            android:layout_gravity="center"
+            android:layout_marginBottom="@dimen/large_spacing"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="The Interview was successfully uploaded. You can listen to it under the following link:"/>
+
+        <TextView
+            android:layout_marginTop="@dimen/spacing"
+            android:layout_marginBottom="@dimen/large_spacing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="http://geschichtswerkstatt.brandis.eu/"
+            android:textColor="@color/colorPrimaryDark"
+            android:onClick="onUrlClicked"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Back"
+            style="@style/textButtonStyle"
+            android:onClick="onBackButtonClicked"
+            android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

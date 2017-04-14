@@ -33,12 +33,13 @@
         <activity
             android:name=".activities.RecorderActivity"
             android:label="@string/title_activity_recorder"
-            android:theme="@style/AppTheme"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".activities.SynopsisActivity"
             android:label="@string/title_activity_synopsis"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
+        <activity android:name=".activities.UploadActivity"></activity>
     </application>
 
 </manifest>
