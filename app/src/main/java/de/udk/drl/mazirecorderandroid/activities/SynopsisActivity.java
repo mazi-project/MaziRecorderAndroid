@@ -72,7 +72,7 @@ public class SynopsisActivity extends BaseActivity {
             ActivityCompat.requestPermissions(this, PERMISSIONS_SYNOPSIS, REQUEST_SYNOPSIS_PERMISSIONS);
         }
 
-        interviewStorage = InterviewStorage.getInstance();
+        interviewStorage = InterviewStorage.getInstance(this);
 
         final EditText editTextSynopsis = (EditText) findViewById(R.id.edit_text_synopsis);
         final ImageView pictureView = (ImageView) findViewById(R.id.picture_view);

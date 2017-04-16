@@ -12,6 +12,7 @@ public class AttachmentModel implements Serializable {
     public String[] tags;
     public String file;
 
+    public String interviewId = null;
 
 
     @Override

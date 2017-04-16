@@ -15,6 +15,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.widget.RxTextView;
+
 import java.util.ArrayList;
 
 import de.udk.drl.mazirecorderandroid.adapters.QuestionAdapter;
@@ -44,8 +46,8 @@ public class QuestionListActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_question_list);
 
-        questionStorage = QuestionStorage.getInstance();
-        interviewStorage = InterviewStorage.getInstance();
+        questionStorage = QuestionStorage.getInstance(this);
+        interviewStorage = InterviewStorage.getInstance(this);
 
         //setup listview
         questionListView = (ListView) findViewById(R.id.questionList);
@@ -75,12 +77,22 @@ public class QuestionListActivity extends BaseActivity {
 
         // custom dialog
         final Dialog dialog = new Dialog(this);
+
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_question);
 
         final EditText input = (EditText) dialog.findViewById(R.id.edit_text_question);
         final Button accept = (Button) dialog.findViewById(R.id.ok_button);
         final Button reject = (Button) dialog.findViewById(R.id.cancel_button);
+
+        final Observable<CharSequence> editTextObservable = RxTextView.textChanges(input);
+
+        final Disposable dialogSubscriber = editTextObservable.subscribe(new Consumer<CharSequence>() {
+            @Override
+            public void accept(CharSequence charSequence) throws Exception {
+                accept.setEnabled(charSequence.length() > MIN_INPUT_LENGTH);
+            }
+        });
 
         accept.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,6 +108,13 @@ public class QuestionListActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+            }
+        });
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialogInterface) {
+                dialogSubscriber.dispose();
             }
         });
 

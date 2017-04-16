@@ -1,5 +1,6 @@
 package de.udk.drl.mazirecorderandroid.models;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
@@ -7,6 +8,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import de.udk.drl.mazirecorderandroid.activities.BaseActivity;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.subjects.BehaviorSubject;
@@ -32,17 +34,11 @@ public class QuestionStorage extends Observable<ArrayList<QuestionModel>> {
         load();
     }
 
-    public static QuestionStorage getInstance() {
+    public static QuestionStorage getInstance(Context context) {
         if (instance == null) {
-            throw new Error("Class need to be intantiated with shared preferences Object");
+            instance = new QuestionStorage(context.getSharedPreferences(BaseActivity.APP_STRING, Context.MODE_PRIVATE));
         }
         return instance;
-    }
-
-    public static void createInstance(SharedPreferences storage) {
-        if (instance == null) {
-            instance = new QuestionStorage(storage);
-        }
     }
 
     public ArrayList<QuestionModel> getAll() {

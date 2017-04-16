@@ -28,12 +28,8 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // init storage
-        QuestionStorage.createInstance(getPreferences(MODE_PRIVATE));
-        InterviewStorage.createInstance(getPreferences(MODE_PRIVATE));
-
         // load data
-        interviewStorage = InterviewStorage.getInstance();
+        interviewStorage = InterviewStorage.getInstance(this);
 
         final Button continueButton = (Button) findViewById(R.id.continueButton);
         final Button newButton = (Button) findViewById(R.id.newButton);

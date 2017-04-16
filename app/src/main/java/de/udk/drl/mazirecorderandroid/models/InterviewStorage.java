@@ -1,11 +1,13 @@
 package de.udk.drl.mazirecorderandroid.models;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 
 import org.reactivestreams.Subscription;
 
+import de.udk.drl.mazirecorderandroid.activities.BaseActivity;
 import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.subjects.BehaviorSubject;
@@ -31,17 +33,11 @@ public class InterviewStorage extends Observable<InterviewModel> {
         load();
     }
 
-    public static InterviewStorage getInstance() {
+    public static InterviewStorage getInstance(Context context) {
         if (instance == null) {
-            throw new Error("Class need to be intantiated with shared preferences Object");
+            instance = new InterviewStorage(context.getSharedPreferences(BaseActivity.APP_STRING, Context.MODE_PRIVATE));
         }
         return instance;
-    }
-
-    public static void createInstance(SharedPreferences storage) {
-        if (instance == null) {
-            instance = new InterviewStorage(storage);
-        }
     }
 
     public void createNew() {

@@ -42,7 +42,7 @@ public class QuestionAdapter extends ArrayAdapter<QuestionModel> {
 
         View view = LayoutInflater.from(this.getContext()).inflate(resourceId, parent, false);
 
-        ArrayList<AttachmentModel> attachments = InterviewStorage.getInstance().interview.attachments;
+        ArrayList<AttachmentModel> attachments = InterviewStorage.getInstance(this.getContext()).interview.attachments;
 
         TextView textView = (TextView) view.findViewById(R.id.question_text);
         textView.setText(question);

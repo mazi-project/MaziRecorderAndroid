@@ -174,7 +174,8 @@ public class SoundRecorderWav extends SoundRecorder {
 
         while (recorder.read(buffer, 0, buffer.length) > 0) {
 
-            callback.onNewData(getMaxAbs(buffer));
+            if (callback != null)
+                callback.onNewData(getMaxAbs(buffer));
 
             // write buffer to file
             try {
