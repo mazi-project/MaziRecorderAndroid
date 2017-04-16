@@ -49,15 +49,15 @@ public class UploadActivity extends BaseActivity {
         uploading = true;
 
         InterviewUploader uploader = new InterviewUploader(this);
-        uploader.postInterview(this.interview).subscribe(new Observer<JSONObject>() {
+        uploader.postInterview(this.interview).subscribe(new Observer<Boolean>() {
             @Override
             public void onSubscribe(Disposable d) {
 
             }
 
             @Override
-            public void onNext(JSONObject json) {
-                Log.e("RESPONSE",json.toString());
+            public void onNext(Boolean result) {
+                Log.e("RESPONSE",result.toString());
             }
 
             @Override

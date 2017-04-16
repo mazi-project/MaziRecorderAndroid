@@ -4,25 +4,18 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import de.udk.drl.mazirecorderandroid.models.AttachmentModel;
 import de.udk.drl.mazirecorderandroid.models.InterviewModel;
-import de.udk.drl.mazirecorderandroid.utils.ObservableProperty;
 import de.udk.drl.mazirecorderandroid.utils.Utils;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
@@ -30,11 +23,7 @@ import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Multipart;
@@ -42,7 +31,6 @@ import retrofit2.http.POST;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 /**
  * Created by lutz on 04/11/16.
@@ -98,6 +86,13 @@ public class InterviewUploader {
                 @Path("interviewId") String interviewId,
                 @Part MultipartBody.Part file
         );
+
+        @Multipart
+        @POST("upload/attachment/{attachmentId}")
+        Observable<ResponseBody> uploadAttachment(
+                @Path("attachmentId") String attachmentId,
+                @Part MultipartBody.Part file
+        );
     }
 
     public Context context;
@@ -106,7 +101,7 @@ public class InterviewUploader {
         this.context = context;
     }
 
-    public Observable<JSONObject> postInterview(final InterviewModel interview) {
+    public Observable<Boolean> postInterview(final InterviewModel interview) {
 
         final APIService service = ServiceGenerator.createService(APIService.class);
 
@@ -117,50 +112,61 @@ public class InterviewUploader {
                     @Override
                     public Observable<ResponseBody> apply(JSONObject json) throws Exception {
                         String id = json.getJSONObject("interview").getString("_id");
-                        MultipartBody.Part image = MultipartBody.Part.createFormData("_","_");
-                        if (interview.imageFile != null) {
-                            File file = new File(interview.imageFile);
-                            if (file.exists())
-                                image = prepareFilePart("file", file);
-                        }
-                        return service.uploadImage(id,image);
+
+                        if (interview.imageFile == null)
+                            return Observable.empty();
+                        File file = new File(interview.imageFile);
+
+                        if (!file.exists())
+                            return Observable.empty();
+
+                        MultipartBody.Part image = prepareFilePart("file", file);
+                        return service.uploadImage(id, image);
                     }
                 }).map(new ConvertToJsonFunction())
                 .flatMapIterable(new Function<JSONObject, Iterable<AttachmentModel>>() {
-                    @Override
                     // create list of attachments
+                    @Override
                     public Iterable<AttachmentModel> apply(JSONObject json) throws Exception {
-                        String id = json.getJSONObject("interview").getString("_id");
+                        String id = json.getString("_id");
                         for (AttachmentModel attachments : interview.attachments)
                             attachments.interviewId = id;
                         return interview.attachments;
                     }
                 })
                 .flatMap(new Function<AttachmentModel, Observable<ResponseBody>>() {
-                    //post attachments
+                    // post attachments
                     @Override
-                    public Observable<ResponseBody> apply(AttachmentModel model) throws Exception {
-                        return service.postAttachment(model.text,model.tags,model.interviewId);
-                    }
-               }).toList().map(new Function<List<ResponseBody>, JSONObject>() {
-                    @Override
-                    public JSONObject apply(List<ResponseBody> responses) throws Exception {
-                        JSONObject json = new JSONObject();
-                        for (ResponseBody response : responses) {
-                            Log.i("RESPONSE", response.string());
-                        }
-                        json.put("success",true);
+                    public Observable<ResponseBody> apply(final AttachmentModel model) throws Exception {
+                        return service.postAttachment(model.text,model.tags,model.interviewId)
+                                .map(new ConvertToJsonFunction())
+                                .flatMap(new Function<JSONObject, Observable<ResponseBody>>() {
+                                    // upload attachment file for each attachment
+                                    @Override
+                                    public Observable<ResponseBody> apply(JSONObject json) throws Exception {
+                                        String id = json.getString("_id");
 
-                        return json;
+                                        if (model.file == null)
+                                            return Observable.empty();
+                                        File file = new File(model.file);
+
+                                        if (!file.exists())
+                                            return Observable.empty();
+
+                                        MultipartBody.Part filePart = prepareFilePart("file", file);
+                                        return service.uploadAttachment(id, filePart);
+                                    }
+                                });
+                    }
+               }).toList()
+                .map(new Function<List<ResponseBody>, Boolean>() {
+                    // final check if everything went allright
+                    @Override
+                    public Boolean apply(List<ResponseBody> responseBodies) throws Exception {
+                        return true;
                     }
                 }).toObservable().subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread());
 
-    }
-
-    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
-
-    private static RequestBody createPartFromString(String descriptionString) {
-        return RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), descriptionString);
     }
 
     private MultipartBody.Part prepareFilePart(String partName, File file) {
