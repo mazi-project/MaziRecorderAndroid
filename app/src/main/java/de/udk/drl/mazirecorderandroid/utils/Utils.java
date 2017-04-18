@@ -14,6 +14,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by lutz on 03/11/16.
@@ -87,5 +89,14 @@ public class Utils {
                     fileExtension.toLowerCase());
         }
         return mimeType;
+    }
+
+    public static List<String> getRegexMatches(String text, String pattern) {
+        List<String> allMatches = new ArrayList<String>();
+        Matcher m = Pattern.compile(pattern).matcher(text);
+        while (m.find()) {
+            allMatches.add(m.group());
+        }
+        return allMatches;
     }
 }

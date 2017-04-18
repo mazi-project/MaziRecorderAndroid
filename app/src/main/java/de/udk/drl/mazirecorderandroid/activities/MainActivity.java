@@ -38,7 +38,7 @@ public class MainActivity extends BaseActivity {
 
         // set up rx patterns
         final Observable<CharSequence> editNameObservable = RxTextView.textChanges(editTextName);
-        Observable<CharSequence> editRoleObservable = RxTextView.textChanges(editTextRole);
+        final Observable<CharSequence> editRoleObservable = RxTextView.textChanges(editTextRole);
 
         subscribers.add(
             Observable.combineLatest(editNameObservable, editRoleObservable,
@@ -77,7 +77,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void onNewButtonClicked(View view) {
-        interviewStorage.createNew();
+        interviewStorage.reset();
     }
 
     public void onContinueButtonClicked(View view) {

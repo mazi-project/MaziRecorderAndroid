@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.text.InputFilter;
+import android.text.Spanned;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -89,35 +91,51 @@ public class RecorderActivity extends BaseActivity {
         final View saveButton = findViewById(R.id.save_button);
         final View cancelButton = findViewById(R.id.cancel_button);
         final ToggleButton recordButton = (ToggleButton) findViewById(R.id.record_button);
+        final EditText tagField = ((EditText) findViewById(R.id.edit_text_tags));
+
+        //add input filter to tagfield to allow only letters, space and _
+        InputFilter filter = new InputFilter() {
+            public CharSequence filter(CharSequence source, int start, int end,
+                                       Spanned dest, int dstart, int dend) {
+
+                if (!source.toString().matches("^[a-zA-Z0-9_ ]*"))
+                    return "";
+                return null;
+            }
+        };
+        tagField.setFilters(new InputFilter[] { filter });
+
 
         // update ui according to recorder state
         subscribers.add(
-            state.distinctUntilChanged().subscribe(new Consumer<RecorderState>() {
-                @Override
-                public void accept(RecorderState state) throws Exception {
-                    if (state == RecorderState.RECORDING) {
-                        textView.setText("Stop Recording");
-                        saveButton.setVisibility(View.INVISIBLE);
-                        cancelButton.setVisibility(View.INVISIBLE);
-                        recordButton.setChecked(true);
-                    } else if (state == RecorderState.STOPPED) {
-                        textView.setText("Continue Recording");
-                        saveButton.setVisibility(View.VISIBLE);
-                        cancelButton.setVisibility(View.VISIBLE);
-                        recordButton.setChecked(false);
-                        waveformView.clearAudioData();
-                    } else {
-                        textView.setText("Start Recording");
-                        progressBar.setProgress(0);
-                        timerView.setText(convertTimeString(0));
-                        saveButton.setVisibility(View.INVISIBLE);
-                        cancelButton.setVisibility(View.INVISIBLE);
-                        recordButton.setChecked(false);
-                        waveformView.clearAudioData();
+                state.distinct().subscribe(new Consumer<RecorderState>() {
+                    @Override
+                    public void accept(RecorderState state) throws Exception {
+                        if (state == RecorderState.RECORDING) {
+                            textView.setText("Stop Recording");
+                            saveButton.setVisibility(View.INVISIBLE);
+                            cancelButton.setVisibility(View.INVISIBLE);
+                            recordButton.setChecked(true);
+                        } else if (state == RecorderState.STOPPED) {
+                            textView.setText("Continue Recording");
+                            saveButton.setVisibility(View.VISIBLE);
+                            cancelButton.setVisibility(View.VISIBLE);
+                            recordButton.setChecked(false);
+                            waveformView.clearAudioData();
+                        } else {
+                            textView.setText("Start Recording");
+                            progressBar.setProgress(0);
+                            timerView.setText(convertTimeString(0));
+                            saveButton.setVisibility(View.INVISIBLE);
+                            cancelButton.setVisibility(View.INVISIBLE);
+                            recordButton.setChecked(false);
+                            waveformView.clearAudioData();
+                        }
                     }
-                }
-            })
+                })
         );
+
+//
     }
 
     @Override

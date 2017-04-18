@@ -80,7 +80,7 @@ public class UploadActivity extends BaseActivity {
             @Override
             public void onComplete() {
                 InterviewStorage storage = InterviewStorage.getInstance(UploadActivity.this);
-                storage.createNew();
+                storage.reset();
                 storage.save();
             }
         });

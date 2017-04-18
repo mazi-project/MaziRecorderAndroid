@@ -106,7 +106,7 @@ public class SynopsisActivity extends BaseActivity {
                 public String apply(InterviewModel interviewModel) throws Exception {
                     return interviewModel.imageFile;
                 }
-            }).retry().distinctUntilChanged().map(new Function<String, Bitmap>() {
+            }).retry().distinct().map(new Function<String, Bitmap>() {
                 @Override
                 public Bitmap apply(String path) throws Exception {
                     Bitmap bmp = BitmapFactory.decodeFile(path);

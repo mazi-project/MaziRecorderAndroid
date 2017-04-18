@@ -40,7 +40,7 @@ public class InterviewStorage extends Observable<InterviewModel> {
         return instance;
     }
 
-    public void createNew() {
+    public void reset() {
         interview = new InterviewModel();
         observable.onNext(interview);
     }
