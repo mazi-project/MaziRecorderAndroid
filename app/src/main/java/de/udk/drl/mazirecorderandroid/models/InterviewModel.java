@@ -27,5 +27,8 @@ public class InterviewModel {
     public String imageFile = null;
 
     public String serverId = null;
-    public boolean isNew = true;
+
+    public boolean isNew() {
+        return name == "" && role == "";
+    }
 }

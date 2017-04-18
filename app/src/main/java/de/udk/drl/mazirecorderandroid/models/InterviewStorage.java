@@ -46,7 +46,6 @@ public class InterviewStorage extends Observable<InterviewModel> {
     }
 
     public void save() {
-        interview.isNew = false;
 
         SharedPreferences.Editor prefsEditor = storage.edit();
         Gson gson = new Gson();

@@ -59,14 +59,14 @@ public class MainActivity extends BaseActivity {
             interviewStorage.subscribe(new Consumer<InterviewModel>() {
                 @Override
                 public void accept(InterviewModel model) throws Exception {
-                    if (model.isNew) {
-                        continueButton.setText("START INTEFVIEW");
+                    if (model.isNew()) {
+                        continueButton.setText("START INTERVIEW");
                     } else {
                         continueButton.setText("CONTINUE INTERVIEW");
                     }
-                    newButton.setEnabled(!model.isNew);
-                    editTextName.setEnabled(model.isNew);
-                    editTextRole.setEnabled(model.isNew);
+                    newButton.setEnabled(!model.isNew());
+                    editTextName.setEnabled(model.isNew());
+                    editTextRole.setEnabled(model.isNew());
 
                     editTextName.setText(interviewStorage.interview.name);
                     editTextRole.setText(interviewStorage.interview.role);

@@ -96,7 +96,12 @@ public class SynopsisActivity extends BaseActivity {
 
         // update image
         subscribers.add(
-            interviewStorage.map(new Function<InterviewModel, String>() {
+            interviewStorage.skipWhile(new Predicate<InterviewModel>() {
+                @Override
+                public boolean test(InterviewModel interviewModel) throws Exception {
+                    return interviewModel.imageFile == null;
+                }
+            }).map(new Function<InterviewModel, String>() {
                 @Override
                 public String apply(InterviewModel interviewModel) throws Exception {
                     return interviewModel.imageFile;

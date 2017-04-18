@@ -49,7 +49,9 @@ public class UploadActivity extends BaseActivity {
         uploading = true;
 
         InterviewUploader uploader = new InterviewUploader(this);
+
         uploader.postInterview(this.interview).subscribe(new Observer<Boolean>() {
+
             @Override
             public void onSubscribe(Disposable d) {
 
@@ -57,55 +59,31 @@ public class UploadActivity extends BaseActivity {
 
             @Override
             public void onNext(Boolean result) {
-                Log.e("RESPONSE",result.toString());
+                //delete interview
+
+                findViewById(R.id.uploading_layout).setVisibility(View.GONE);
+                findViewById(R.id.done_layout).setVisibility(View.VISIBLE);
+
+                TextView linkText = (TextView) findViewById(R.id.link_text);
+                linkText.setText(InterviewUploader.APP_BASE_URL);
             }
 
             @Override
             public void onError(Throwable e) {
-                Log.e("RESPONSE",e.toString());
+                Log.e("RESPONSE", e.toString());
+                if (e instanceof java.net.ConnectException)
+                    showAlert("ERROR", "Could not connect to server. Please connect to the MAZI Hotspot and try uploading again.", true);
+                else
+                    showAlert("ERROR", "Error: " + e.getMessage(), true);
             }
 
             @Override
             public void onComplete() {
-
+                InterviewStorage storage = InterviewStorage.getInstance(UploadActivity.this);
+                storage.createNew();
+                storage.save();
             }
         });
-
-//        httpRequest = InterviewUploader.postInterview(this.interview, new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call,
-//                                   Response<ResponseBody> response) {
-//                hideOverlay();
-//
-//                JSONObject json;
-//
-//                try {
-//                    String string = response.body().string();
-//                    Log.e(LOG_TAG, "Upload response: " + string);
-//                    json = new JSONObject(string);
-//                    if (!json.has("interview")) {
-//                        showAlert("Fehler", "Upload fehlgeschlagen: " + string, true);
-//                        return;
-//                    }
-//                } catch (Exception e) {
-//                    showAlert("Fehler", "Upload fehlgeschlagen: " + e.getMessage(), true);
-//                    e.printStackTrace();
-//                    return;
-//                }
-//
-//
-//                //delete story
-//                //InterviewStorage.getInstance().createNew();
-//
-//                findViewById(R.id.uploading_layout).setVisibility(View.GONE);
-//                findViewById(R.id.done_layout).setVisibility(View.VISIBLE);
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                showAlert("Fehler", "Es konnte keine Verbindung zum Server hergestellt werden: " + t.getMessage(), true);
-//            }
-//        });
     }
 
     public void onUrlClicked(View view) {
@@ -116,6 +94,9 @@ public class UploadActivity extends BaseActivity {
     }
 
     public void onBackButtonClicked(View view) {
-        this.finish();
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+
     }
 }

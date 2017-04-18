@@ -2,19 +2,16 @@ package de.udk.drl.mazirecorderandroid.network;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import de.udk.drl.mazirecorderandroid.models.AttachmentModel;
 import de.udk.drl.mazirecorderandroid.models.InterviewModel;
 import de.udk.drl.mazirecorderandroid.utils.Utils;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -37,7 +34,9 @@ import retrofit2.http.Path;
  */
 public class InterviewUploader {
 
-    public static final String API_BASE_URL = "http://192.168.1.2:8081/api/";
+
+    public static final String APP_BASE_URL = "http://192.168.1.2:8081/";
+    public static final String API_BASE_URL = APP_BASE_URL + "api/";
 
     public static final String API_DATE_FORMAT = "yyyy-MM-dd";
 

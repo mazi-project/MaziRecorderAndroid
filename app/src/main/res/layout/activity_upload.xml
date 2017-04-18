@@ -48,16 +48,19 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textAlignment="center"
             android:text="The Interview was successfully uploaded. You can listen to it under the following link:"/>
 
         <TextView
+            android:id="@+id/link_text"
             android:layout_marginTop="@dimen/spacing"
             android:layout_marginBottom="@dimen/large_spacing"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="http://geschichtswerkstatt.brandis.eu/"
+            android:text="Link"
             android:textColor="@color/colorPrimaryDark"
-            android:onClick="onUrlClicked"/>
+            android:onClick="onUrlClicked"
+            android:textAlignment="center"/>
 
         <Button
             android:layout_width="wrap_content"
