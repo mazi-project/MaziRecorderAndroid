@@ -54,7 +54,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class SynopsisActivity extends BaseActivity {
 
-    public static final String PICTURE_FILES_DIRECTORY = "Attachments";
+    public static final String PICTURE_FILES_DIRECTORY = "mazi_recorder";
 
     private static final int REQUEST_IMAGE_CAPTURE_CODE = 3;
 

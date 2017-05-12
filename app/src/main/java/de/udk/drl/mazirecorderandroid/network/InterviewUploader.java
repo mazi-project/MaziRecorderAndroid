@@ -35,7 +35,7 @@ import retrofit2.http.Path;
 public class InterviewUploader {
 
 
-    public static final String APP_BASE_URL = "http://192.168.1.2:8081/";
+    public static final String APP_BASE_URL = "http://local.mazizone.eu:9091/";
     public static final String API_BASE_URL = APP_BASE_URL + "api/";
 
     public static final String API_DATE_FORMAT = "yyyy-MM-dd";
